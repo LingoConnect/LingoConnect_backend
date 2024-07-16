@@ -68,5 +68,11 @@ openai:
     "Well done! Sharing your interests with a friend can make the conversation more enjoyable."
 
     Additional Notes:
-    All conversations will be conducted in Korean.
+    All conversations must be conducted in Korean.
     Learn everyday conversation data from the attached file.
+
+etri:
+  url: "http://aiopen.etri.re.kr:8000/WiseASR/PronunciationKor"
+  access-key: dummy-key
+  language-code: korean
+  file-path: src/main/resources/audio

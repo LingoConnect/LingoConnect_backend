@@ -72,4 +72,17 @@ public class GptService {
         }
         return result;
     }
+
+    public boolean checkAssistant(String name){
+        JsonObject object = JsonParser.parseString(openAiClient.listAssistant()).getAsJsonObject();
+        JsonArray data = object.getAsJsonArray("data");
+
+        for(JsonElement element : data){
+            String objectName = element.getAsJsonObject().get("name").getAsString();
+            if(name.equals(objectName)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

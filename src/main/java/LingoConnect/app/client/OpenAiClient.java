@@ -52,6 +52,16 @@ public class OpenAiClient {
                 .block();
     }
 
+    public String listAssistant() {
+        return webClient.get()
+                .uri("https://api.openai.com/v1/assistants")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
 
     public String createThread() {
         return webClient.post()
