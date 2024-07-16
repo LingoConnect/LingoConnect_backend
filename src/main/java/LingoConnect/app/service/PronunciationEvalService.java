@@ -23,13 +23,13 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class PronounciationEvalService {
+public class PronunciationEvalService {
     private final String openApiURL;
     private final String accessKey;
     private final String languageCode;
     private final String audioFilePath;
 
-    public PronounciationEvalService(@Value("${etri.url}") String openApiURL,
+    public PronunciationEvalService(@Value("${etri.url}") String openApiURL,
                                      @Value("${etri.access-key}") String accessKey,
                                      @Value("${etri.language-code}") String languageCode,
                                      @Value("${etri.file-path}") String audioFilePath) {
@@ -39,7 +39,7 @@ public class PronounciationEvalService {
         this.audioFilePath = audioFilePath;
     }
 
-    private String evaluate(String audioFileName){
+    public String evaluate(String audioFileName){
         Gson gson = new Gson();
 
         Map<String, Object> request = new HashMap<>();
@@ -83,11 +83,10 @@ public class PronounciationEvalService {
             responBody = new String(buffer);
 
             JsonObject object = JsonParser.parseString(responBody).getAsJsonObject();
-            String result = object.get("return_object").getAsString();
+            String result = object.get("return_object").getAsJsonObject().get("score").getAsString();
 
             log.info("평가 결과: {}", result);
             return result;
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

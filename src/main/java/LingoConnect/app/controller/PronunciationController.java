@@ -2,19 +2,14 @@ package LingoConnect.app.controller;
 
 import LingoConnect.app.request.GptRequest;
 import LingoConnect.app.response.SuccessResponse;
-import LingoConnect.app.service.GptService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import LingoConnect.app.service.PronunciationEvalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
@@ -23,23 +18,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @Slf4j
-@RequestMapping("/openai")
-@RequiredArgsConstructor
-public class GptController {
+@RequestMapping("/pronunciation")
+public class PronunciationController {
 
-    @Autowired
-    private GptService gptService;
+    private PronunciationEvalService pronunciationEvalService;
 
-    private int flag = 0;
+    public PronunciationController(PronunciationEvalService pronunciationEvalService) {
+        this.pronunciationEvalService = pronunciationEvalService;
+    }
 
-    private int count = 0;
     @GetMapping("/")
     @Transactional
     @Operation(
-            summary = "get Ai Response from Backend Server",
+            summary = "evaluate pronunciation",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -67,34 +60,10 @@ public class GptController {
                     )
             }
     )
-    public ResponseEntity<?> getAiResponse(@ModelAttribute GptRequest gptRequest) throws InterruptedException {
-        count++;
-        if(count>5){
-            return ResponseEntity.ok().body("과금 방지 제한");
-        }
-        String title = gptRequest.getTitle();
-        String question = gptRequest.getQuestion();
-        String userAnswer = gptRequest.getUserAnswer();
+    public ResponseEntity<?> evaluatePronunciation() {
+        String result = pronunciationEvalService.evaluate("KOR_M_RM0276MKDH0135.pcm");
+        log.info("result: {}", result);
 
-        String content = title + question + userAnswer;
-
-        if(gptService.checkAssistant("lingoConnect")){
-            // 이미 lingoConnect Ai가 존재하는 경우
-            String assistantId = "asst_72rWdwPlhnx8wsH6kSZ2Nypk";
-
-            return ResponseEntity.ok().body(response(content, assistantId));
-        } else {
-            // lingoConnect Ai를 새로 생성하는 경우
-            String assistantId = gptService.getAssistantId("gpt-3.5-turbo-0125");
-
-            return ResponseEntity.ok().body(response(content, assistantId));
-        }
-    }
-
-    private String response(String content, String assistantId) throws InterruptedException {
-        String threadId = gptService.createThreadAndGetId();
-        String messageId = gptService.createMessageAndGetId(threadId, content);
-        String runId = gptService.createRun(threadId, assistantId);
-        return gptService.getResponse(threadId, runId);
+        return ResponseEntity.ok().body("음성평가 결과: " + result + " 점");
     }
 }
