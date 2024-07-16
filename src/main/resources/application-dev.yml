@@ -1,0 +1,49 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:/}
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: ${APP_NAME:AppName}
+    description: ${APP_DESCRIPTION:App Description}
+  jpa:
+    hibernate:
+      ddl-auto: ${DB_DDL_AUTO:none}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: false
+        format_sql: true
+        globally_quoted_identifiers: true
+    open-in-view: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lingoconnect
+    username: lingo
+    password: lingo
+    driver-class-name: org.postgresql.Driver
+
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:true}
+    change-log: classpath:/db/changelog/master.xml
+  docker:
+    compose:
+      lifecycle-management: none
+
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:true}
+    path: /api-docs
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+    operationsSorter: alpha
+    tagsSorter: alpha
+    path: ${SWAGGER_PATH:/swagger-ui}
+  show-actuator: true
