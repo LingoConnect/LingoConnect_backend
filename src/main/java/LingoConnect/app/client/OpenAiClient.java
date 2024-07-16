@@ -7,13 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import com.google.gson.JsonObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -27,14 +22,14 @@ public class OpenAiClient {
                         @Value("${openai.api-key}") String apiKey,
                         @Value("${openai.instructions}") String instructions) {
         this.webClient = webClientBuilder
-                .filter(logRequest())
-                .filter(logResponse())
+//                .filter(logRequest())
+//                .filter(logResponse())
                 .build();
         this.apiKey = apiKey;
         this.instructions = instructions;
     }
 
-    public Mono<String> createAssistant(String model) {
+    public String createAssistant(String model) {
         JsonObject json = new JsonObject();
         json.addProperty("name", "lingoConnect");
         json.addProperty("instructions", instructions);
@@ -46,7 +41,6 @@ public class OpenAiClient {
 
         json.add("tools", tools);
 
-        log.info("json to String: {}", json.toString());
         return webClient.post()
                 .uri("https://api.openai.com/v1/assistants")
                 .header("Content-Type", "application/json")
@@ -54,7 +48,79 @@ public class OpenAiClient {
                 .header("OpenAI-Beta", "assistants=v2")
                 .bodyValue(json.toString())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .block();
+    }
+
+
+    public String createThread() {
+        return webClient.post()
+                .uri("https://api.openai.com/v1/threads")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    public String createMessage(String threadId, String content) {
+        JsonObject json = new JsonObject();
+        json.addProperty("role", "user");
+        json.addProperty("content", content);
+
+        String fullUrl = String.format("https://api.openai.com/v1/threads/%s/messages", threadId);
+        return webClient.post()
+                .uri(fullUrl)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .bodyValue(json.toString())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    public String createRun(String threadId, String assistantId) {
+        JsonObject json = new JsonObject();
+        json.addProperty("assistant_id", assistantId);
+
+        String fullUrl = String.format("https://api.openai.com/v1/threads/%s/runs", threadId);
+        return webClient.post()
+                .uri(fullUrl)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .bodyValue(json.toString())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    public String checkRun(String threadId, String runId) {
+        String fullUrl = String.format("https://api.openai.com/v1/threads/%s/runs/%s", threadId, runId);
+        return webClient.get()
+                .uri(fullUrl)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    // 결과를 가져오는 것은 ListMessage 결과 내의 data -> content -> text -> value
+    public String listMessages(String threadId) {
+
+        String fullUrl = String.format("https://api.openai.com/v1/threads/%s/messages", threadId);
+        return webClient.get()
+                .uri(fullUrl)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("OpenAI-Beta", "assistants=v2")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     private ExchangeFilterFunction logRequest() {
