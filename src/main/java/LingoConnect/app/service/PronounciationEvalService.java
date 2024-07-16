@@ -39,14 +39,17 @@ public class PronounciationEvalService {
         this.audioFilePath = audioFilePath;
     }
 
-    private String evaluate(String script, String audioContents, String audio){
+    private String evaluate(String audioFileName){
         Gson gson = new Gson();
 
         Map<String, Object> request = new HashMap<>();
         Map<String, String> argument = new HashMap<>();
-
+        
+        String filePath = audioFilePath + "/" + audioFileName;
+        String audioContents = null;
+        
         try {
-            Path path = Paths.get(audioFilePath);
+            Path path = Paths.get(filePath);
             byte[] audioBytes = Files.readAllBytes(path);
             audioContents = Base64.getEncoder().encodeToString(audioBytes);
         } catch (IOException e) {
@@ -54,9 +57,7 @@ public class PronounciationEvalService {
         }
 
         argument.put("language_code", languageCode);
-        argument.put("script", script);
         argument.put("audio", audioContents);
-
         request.put("argument", argument);
 
         URL url;
