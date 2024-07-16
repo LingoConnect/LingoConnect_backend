@@ -34,6 +34,8 @@ public class GptController {
     private GptService gptService;
 
     private int flag = 0;
+
+    private int count = 0;
     @GetMapping("/")
     @Transactional
     @Operation(
@@ -66,6 +68,10 @@ public class GptController {
             }
     )
     public ResponseEntity<?> getAiResponse(@ModelAttribute GptRequest gptRequest) throws InterruptedException {
+        count++;
+        if(count>5){
+            return ResponseEntity.ok().body("과금 방지 제한");
+        }
         String title = gptRequest.getTitle();
         String question = gptRequest.getQuestion();
         String userAnswer = gptRequest.getUserAnswer();
