@@ -155,6 +155,7 @@ public class OpenAiClient {
         json.addProperty("model", "tts-1");
         json.addProperty("input", text);
         json.addProperty("voice", "nova");
+        json.addProperty("response_format", "pcm");
 
         return webClient.post()
                 .uri("https://api.openai.com/v1/audio/speech")

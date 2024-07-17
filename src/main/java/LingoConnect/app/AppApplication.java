@@ -1,6 +1,7 @@
 package LingoConnect.app;
 
 import LingoConnect.app.service.GptService;
+import LingoConnect.app.service.SttService;
 import LingoConnect.app.service.TtsService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
