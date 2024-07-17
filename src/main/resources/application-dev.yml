@@ -76,3 +76,6 @@ etri:
   access-key: dummy-key
   language-code: korean
   file-path: src/main/resources/audio
+
+audio:
+  file-path: src/main/resources/audio
