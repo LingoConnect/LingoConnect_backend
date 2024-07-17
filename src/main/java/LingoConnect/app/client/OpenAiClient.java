@@ -148,4 +148,23 @@ public class OpenAiClient {
             return Mono.just(clientResponse);
         });
     }
+
+    public byte[] getAudio(String text) {
+
+        JsonObject json = new JsonObject();
+        json.addProperty("model", "tts-1");
+        json.addProperty("input", text);
+        json.addProperty("voice", "nova");
+
+        return webClient.post()
+                .uri("https://api.openai.com/v1/audio/speech")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .bodyValue(json.toString())
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .block();
+    }
+
+
 }
