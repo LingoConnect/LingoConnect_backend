@@ -10,7 +10,7 @@ spring:
     description: ${APP_DESCRIPTION:App Description}
   jpa:
     hibernate:
-      ddl-auto: ${DB_DDL_AUTO:none}
+      ddl-auto: ${DB_DDL_AUTO:update}
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
