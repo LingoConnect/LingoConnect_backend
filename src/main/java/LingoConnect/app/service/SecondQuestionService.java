@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class SecondQuestionService {
@@ -70,5 +72,19 @@ public class SecondQuestionService {
                 .question(secondQuestionDTO.getQuestion())
                 .topQuestion(topQuestion)
                 .build();
+    }
+
+    public ArrayList<SecondQuestionDTO> findByTopQuestionId(Long topQuestionId){
+        TopQuestion topQuestion = topQuestionRepository.findById(topQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("No TopQuestion found with id: " + topQuestionId));
+
+        ArrayList<SecondQuestion> allByTopQuestion = secondQuestionRepository.findAllByTopQuestion(topQuestion);
+        ArrayList<SecondQuestionDTO> dtos = new ArrayList();
+
+        for(SecondQuestion secondQuestion : allByTopQuestion){
+            dtos.add(toDto(secondQuestion));
+        }
+
+        return dtos;
     }
 }

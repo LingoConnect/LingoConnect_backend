@@ -1,7 +1,7 @@
 package LingoConnect.app.controller;
 
 import LingoConnect.app.response.SuccessResponse;
-import LingoConnect.app.service.PronunciationEvalService;
+import LingoConnect.app.service.TopQuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,25 +13,23 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Slf4j
-@RequestMapping("/pronunciation")
-public class PronunciationController {
+@RequestMapping("/topic")
+@RequiredArgsConstructor
+public class TopicController {
 
-    private PronunciationEvalService pronunciationEvalService;
-
-    public PronunciationController(PronunciationEvalService pronunciationEvalService) {
-        this.pronunciationEvalService = pronunciationEvalService;
-    }
+    private final TopQuestionService topQuestionService;
 
     @GetMapping("/")
     @Transactional
     @Operation(
-            summary = "evaluate pronunciation",
+            summary = "get all topics",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -59,10 +57,8 @@ public class PronunciationController {
                     )
             }
     )
-    public ResponseEntity<?> evaluatePronunciation() {
-        String result = pronunciationEvalService.evaluate("KOR_M_RM0276MKDH0135.pcm");
-        log.info("result: {}", result);
-
-        return ResponseEntity.ok().body("음성평가 결과: " + result + " 점");
+    public ResponseEntity<List<String>> listDistinctTopics() {
+        List<String> topics = topQuestionService.getDistinctTopics();
+        return ResponseEntity.ok(topics);  // 성공적으로 유니크한 Topic 목록 반환
     }
 }

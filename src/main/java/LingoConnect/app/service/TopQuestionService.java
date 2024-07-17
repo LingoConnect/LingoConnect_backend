@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TopQuestionService {
@@ -57,6 +59,7 @@ public class TopQuestionService {
 
     private static TopQuestionDTO toDto(TopQuestion topQuestion) {
         TopQuestionDTO topQuestionDTO = TopQuestionDTO.builder()
+                .id(topQuestion.getId())
                 .topic(topQuestion.getTopic())
                 .question(topQuestion.getQuestion())
                 .imagePath(topQuestion.getImagePath())
@@ -72,5 +75,16 @@ public class TopQuestionService {
                 .imagePath(topQuestionDTO.getImagePath())
                 .build();
         return topQuestion;
+    }
+
+    public TopQuestionDTO findByTopic(String topic) {
+        TopQuestion topquestion = topQuestionRepository.findByTopic(topic)
+                .orElseThrow(() -> new IllegalArgumentException("No TopQuestion found with topic"));
+
+        return toDto(topquestion);
+    }
+
+    public List<String> getDistinctTopics() {
+        return topQuestionRepository.findDistinctTopics();
     }
 }

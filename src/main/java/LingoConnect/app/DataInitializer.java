@@ -29,10 +29,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void insertSecondData() {
-        createSecondQuestion("그 과목을 좋아하게 된 특별한 이유가 있나요?", "학교");
-        createSecondQuestion("그 과목에서 배운 것 중 가장 인상 깊었던 내용은 무엇인가요?", "학교");
-        createSecondQuestion("그 과목을 가르치는 선생님은 어떤 분인가요?", "학교");
-        createSecondQuestion("그 과목과 관련된 특별한 활동이나 프로젝트에 참여한 적이 있나요?", "학교");
+        createSecondQuestion("그 과목을 좋아하게 된 특별한 이유가 있나요?", "school");
+        createSecondQuestion("그 과목에서 배운 것 중 가장 인상 깊었던 내용은 무엇인가요?", "school");
+        createSecondQuestion("그 과목을 가르치는 선생님은 어떤 분인가요?", "school");
+        createSecondQuestion("그 과목과 관련된 특별한 활동이나 프로젝트에 참여한 적이 있나요?", "school");
     }
 
     private void createSecondQuestion(String question, String topic) {
@@ -47,13 +47,13 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void insertTopData() {
-        createTopQuestion("학교", "가장 좋아하는 과목은 무엇인가요?", "src/main/resources/img/school.jpg");
-        createTopQuestion("음식", "가장 좋아하는 음식은 무엇인가요?", "src/main/resources/img/food.jpg");
-        createTopQuestion("여행", "가장 기억에 남는 여행지는 어디인가요?", "src/main/resources/img/travel.jpg");
-        createTopQuestion("취미", "취미가 무엇인가요?", "src/main/resources/img/hobby.jpg");
-        createTopQuestion("영화", "가장 좋아하는 영화는 무엇인가요?", "src/main/resources/img/movie.jpg");
-        createTopQuestion("음악", "가장 좋아하는 음악 장르는 무엇인가요?", "src/main/resources/img/music.jpg");
-        createTopQuestion("운동", "가장 좋아하는 운동은 무엇인가요?", "src/main/resources/img/exercise.jpg");
+        createTopQuestion("school", "가장 좋아하는 과목은 무엇인가요?", "src/main/resources/img/school.jpeg");
+        createTopQuestion("food", "가장 좋아하는 음식은 무엇인가요?", "src/main/resources/img/food.jpeg");
+        createTopQuestion("travel", "가장 기억에 남는 여행지는 어디인가요?", "src/main/resources/img/travel.jpeg");
+        createTopQuestion("hobby", "취미가 무엇인가요?", "src/main/resources/img/hobby.jpeg");
+        createTopQuestion("movie", "가장 좋아하는 영화는 무엇인가요?", "src/main/resources/img/movie.jpeg");
+        createTopQuestion("music", "가장 좋아하는 음악 장르는 무엇인가요?", "src/main/resources/img/music.jpeg");
+        createTopQuestion("exercise", "가장 좋아하는 운동은 무엇인가요?", "src/main/resources/img/exercise.jpeg");
     }
 
     private void createTopQuestion(String topic, String question, String imagePath) {

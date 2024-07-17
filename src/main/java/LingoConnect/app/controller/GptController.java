@@ -72,7 +72,7 @@ public class GptController {
         if(count>5){
             return ResponseEntity.ok().body("과금 방지 제한");
         }
-        String title = gptRequest.getTitle();
+        String title = gptRequest.getTopic();
         String question = gptRequest.getQuestion();
         String userAnswer = gptRequest.getUserAnswer();
 

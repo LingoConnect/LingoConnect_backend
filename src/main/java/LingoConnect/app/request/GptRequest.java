@@ -13,12 +13,12 @@ import lombok.*;
 public class GptRequest {
     @NotBlank(message = "{not_blank}")
     @Schema(
-            name = "title",
-            description = "title",
+            name = "topic",
+            description = "topic",
             type = "String",
             requiredMode = Schema.RequiredMode.REQUIRED,
             example = "주제: 일상 대화 연습\n")
-    private String title;
+    private String topic;
 
     @NotBlank(message = "{not_blank}")
     @Schema(
