@@ -17,17 +17,13 @@ public class TopQuestion {
     @Column(nullable = false, length = 1024)
     private String question;
 
-    @Column(nullable = true)
-    private String imagePath;
-
     public TopQuestion() {
     }
 
     @Builder
-    public TopQuestion(Long id, String topic, String question, String imagePath) {
+    public TopQuestion(Long id, String topic, String question) {
         this.id = id;
         this.topic = topic;
         this.question = question;
-        this.imagePath = imagePath;
     }
 }

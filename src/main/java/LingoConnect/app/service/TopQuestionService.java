@@ -41,7 +41,6 @@ public class TopQuestionService {
                 .id(existingTopQuestion.getId()) // 기존 ID 유지
                 .topic(topQuestionDTO.getTopic()) // 새 주제
                 .question(topQuestionDTO.getQuestion()) // 새 질문
-                .imagePath(topQuestionDTO.getImagePath()) // 새 이미지 경로
                 .build();
 
         // 변경된 내용을 저장
@@ -62,7 +61,6 @@ public class TopQuestionService {
                 .id(topQuestion.getId())
                 .topic(topQuestion.getTopic())
                 .question(topQuestion.getQuestion())
-                .imagePath(topQuestion.getImagePath())
                 .build();
 
         return topQuestionDTO;
@@ -72,7 +70,6 @@ public class TopQuestionService {
         TopQuestion topQuestion = TopQuestion.builder()
                 .topic(topQuestionDTO.getTopic())
                 .question(topQuestionDTO.getQuestion())
-                .imagePath(topQuestionDTO.getImagePath())
                 .build();
         return topQuestion;
     }

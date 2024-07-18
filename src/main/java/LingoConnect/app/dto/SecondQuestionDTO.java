@@ -12,11 +12,13 @@ public class SecondQuestionDTO {
     private Long id;
     private String question;
     private Long topQuestionId;
+    private String imageName;
 
     @Builder
-    public SecondQuestionDTO(Long id, String question, Long topQuestionId) {
+    public SecondQuestionDTO(Long id, String question, Long topQuestionId, String imageName) {
         this.id = id;
         this.question = question;
         this.topQuestionId = topQuestionId;
+        this.imageName = imageName;
     }
 }

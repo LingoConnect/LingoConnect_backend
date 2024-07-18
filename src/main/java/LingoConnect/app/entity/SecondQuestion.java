@@ -18,14 +18,18 @@ public class SecondQuestion {
     @JoinColumn(name = "top_question_id", nullable = false)
     private TopQuestion topQuestion;
 
+    @Column(nullable = false)
+    private String imageName;
+
     // Constructors
     public SecondQuestion() {
     }
 
     @Builder
-    public SecondQuestion(Long id, String question, TopQuestion topQuestion) {
+    public SecondQuestion(Long id, String question, TopQuestion topQuestion, String imageName) {
         this.id = id;
         this.question = question;
         this.topQuestion = topQuestion;
+        this.imageName = imageName;
     }
 }

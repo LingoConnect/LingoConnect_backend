@@ -2,6 +2,7 @@ package LingoConnect.app.controller;
 
 import LingoConnect.app.dto.SecondQuestionDTO;
 import LingoConnect.app.dto.TopQuestionDTO;
+import LingoConnect.app.entity.SecondQuestion;
 import LingoConnect.app.response.SuccessResponse;
 import LingoConnect.app.service.SecondQuestionService;
 import LingoConnect.app.service.TopQuestionService;
@@ -10,35 +11,45 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/question")
-@RequiredArgsConstructor
 public class QuestionController {
 
-    private final TopQuestionService topQuestionService;
+    private TopQuestionService topQuestionService;
 
-    private final SecondQuestionService secondQuestionService;
+    private SecondQuestionService secondQuestionService;
+
+    private String imagePath;
+    public QuestionController(TopQuestionService topQuestionService,
+                              SecondQuestionService secondQuestionService,
+                              @Value("${image.file-path}") String imagePath) {
+        this.topQuestionService = topQuestionService;
+        this.secondQuestionService = secondQuestionService;
+        this.imagePath = imagePath;
+    }
 
     @GetMapping("/main")
     @Transactional
@@ -71,28 +82,16 @@ public class QuestionController {
                     )
             }
     )
-    public ResponseEntity<?> getQuestionAndImage(@RequestParam(name = "topic") String topic) {
+    public ResponseEntity<?> getQuestion(@RequestParam(name = "topic") String topic) {
         try {
             TopQuestionDTO topQuestionDTO = topQuestionService.findByTopic(topic);
             if (topQuestionDTO == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            // Build the path to the image file
-            Path imagePath = Paths.get(topQuestionDTO.getImagePath().trim());
-            if (!Files.exists(imagePath) || !Files.isReadable(imagePath)) {
-                return ResponseEntity.notFound().build();
-            }
-
-            // Read image file as byte array
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            String encodedImage = Base64Utils.encodeToString(imageBytes);
-
-            // Prepare response body
             HashMap<String, String> responseBody = new HashMap<>();
-            responseBody.put("topic", topic);
             responseBody.put("question", topQuestionDTO.getQuestion());
-            responseBody.put("image", "data:image/jpeg;base64," + encodedImage);
+            responseBody.put("topic", topic);
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(responseBody);
         } catch (Exception e) {
@@ -130,7 +129,7 @@ public class QuestionController {
                     )
             }
     )
-    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic) {
+    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic) throws IOException {
         TopQuestionDTO topQuestionDTO = topQuestionService.findByTopic(topic);
 
         if (topQuestionDTO == null) {
@@ -139,7 +138,28 @@ public class QuestionController {
 
         ArrayList<SecondQuestionDTO> secondQuestionDTOS = secondQuestionService.findByTopQuestionId(topQuestionDTO.getId());
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(secondQuestionDTOS);
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for(SecondQuestionDTO secondQuestionDTO : secondQuestionDTOS) {
+            Resource resource = new FileSystemResource(imagePath + secondQuestionDTO.getImageName());
+            if (!resource.exists()) {
+                log.error("Resource not found: {}", resource);
+            }
+
+            byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
+            String encodedImage = Base64Utils.encodeToString(imageBytes);
+
+            Map<String, Object> topicObject = new HashMap<>();
+            topicObject.put("main_question_id", secondQuestionDTO.getTopQuestionId());
+            topicObject.put("question", secondQuestionDTO.getQuestion());
+            topicObject.put(topic + "_image", encodedImage);
+            topicObject.put("topic", topic);
+            topicObject.put("id", secondQuestionDTO.getId());
+
+            response.add(topicObject);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
 

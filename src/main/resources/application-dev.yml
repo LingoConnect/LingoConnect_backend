@@ -75,7 +75,10 @@ etri:
   url: "http://aiopen.etri.re.kr:8000/WiseASR/PronunciationKor"
   access-key: dummy-key
   language-code: korean
-  file-path: src/main/resources/audio
+  file-path: audio/
 
 audio:
-  file-path: src/main/resources/audio
+  file-path: audio/
+
+image:
+  file-path: img/

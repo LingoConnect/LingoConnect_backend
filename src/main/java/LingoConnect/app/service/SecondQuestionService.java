@@ -45,6 +45,7 @@ public class SecondQuestionService {
                 .id(existingSecondQuestion.getId()) // 기존 ID 유지
                 .question(secondQuestionDTO.getQuestion()) // 새 질문
                 .topQuestion(topQuestion) // 연결된 TopQuestion 업데이트
+                .imageName(secondQuestionDTO.getImageName())
                 .build();
 
         secondQuestionRepository.save(updatedSecondQuestion);
@@ -61,6 +62,7 @@ public class SecondQuestionService {
                 .id(secondQuestion.getId())
                 .question(secondQuestion.getQuestion())
                 .topQuestionId(secondQuestion.getTopQuestion().getId())
+                .imageName(secondQuestion.getImageName())
                 .build();
     }
 
@@ -71,6 +73,7 @@ public class SecondQuestionService {
         return SecondQuestion.builder()
                 .question(secondQuestionDTO.getQuestion())
                 .topQuestion(topQuestion)
+                .imageName(secondQuestionDTO.getImageName())
                 .build();
     }
 

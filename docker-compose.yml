@@ -26,6 +26,8 @@ services:
       - postgres
     networks:
       - backend
+    volumes:
+      - ./img:/usr/src/app/img
 
 networks:
   backend:
