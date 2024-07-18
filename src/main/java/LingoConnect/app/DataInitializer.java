@@ -48,19 +48,20 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void insertTopData() {
-        createTopQuestion("학교", "가장 좋아하는 과목은 무엇인가요?");
-        createTopQuestion("음식", "가장 좋아하는 음식은 무엇인가요?");
-        createTopQuestion("여행", "가장 기억에 남는 여행지는 어디인가요?");
-        createTopQuestion("취미", "취미가 무엇인가요?");
-        createTopQuestion("영화", "가장 좋아하는 영화는 무엇인가요?");
-        createTopQuestion("음악", "가장 좋아하는 음악 장르는 무엇인가요?");
-        createTopQuestion("운동", "가장 좋아하는 운동은 무엇인가요?");
+        createTopQuestion("학교", "가장 좋아하는 과목은 무엇인가요?","초급");
+        createTopQuestion("음식", "가장 좋아하는 음식은 무엇인가요?","초급");
+        createTopQuestion("여행", "가장 기억에 남는 여행지는 어디인가요?","초급");
+        createTopQuestion("취미", "취미가 무엇인가요?","초급");
+        createTopQuestion("영화", "가장 좋아하는 영화는 무엇인가요?","초급");
+        createTopQuestion("음악", "가장 좋아하는 음악 장르는 무엇인가요?","초급");
+        createTopQuestion("운동", "가장 좋아하는 운동은 무엇인가요?","초급");
     }
 
-    private void createTopQuestion(String topic, String question) {
+    private void createTopQuestion(String topic, String question, String difficulty) {
         TopQuestion topQuestion = TopQuestion.builder()
                 .topic(topic)
                 .question(question)
+                .difficulty(difficulty)
                 .build();
         topQuestionRepository.save(topQuestion);
     }

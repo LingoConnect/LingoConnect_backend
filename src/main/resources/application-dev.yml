@@ -81,4 +81,4 @@ audio:
   file-path: audio/
 
 image:
-  file-path: img/
+  file-path: http://localhost:8080/img/

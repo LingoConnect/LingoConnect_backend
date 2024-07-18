@@ -12,11 +12,13 @@ public class TopQuestionDTO {
     private Long id;
     private String topic;
     private String question;
+    private String difficulty;
 
     @Builder
-    public TopQuestionDTO(Long id, String topic, String question) {
+    public TopQuestionDTO(Long id, String topic, String question, String difficulty) {
         this.id = id;
         this.topic = topic;
         this.question = question;
+        this.difficulty = difficulty;
     }
 }

@@ -14,4 +14,6 @@ public interface TopQuestionRepository extends JpaRepository<TopQuestion, Long> 
 
     @Query("SELECT DISTINCT tq.topic FROM TopQuestion tq")
     List<String> findDistinctTopics();
+
+    List<TopQuestion> findAllByTopic(String topic);
 }

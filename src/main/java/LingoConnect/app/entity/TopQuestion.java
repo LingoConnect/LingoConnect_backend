@@ -17,13 +17,17 @@ public class TopQuestion {
     @Column(nullable = false, length = 1024)
     private String question;
 
+    @Column(nullable = false)
+    private String difficulty;
+
     public TopQuestion() {
     }
 
     @Builder
-    public TopQuestion(Long id, String topic, String question) {
+    public TopQuestion(Long id, String topic, String question, String difficulty) {
         this.id = id;
         this.topic = topic;
         this.question = question;
+        this.difficulty = difficulty;
     }
 }

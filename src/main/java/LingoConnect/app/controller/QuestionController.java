@@ -2,10 +2,10 @@ package LingoConnect.app.controller;
 
 import LingoConnect.app.dto.SecondQuestionDTO;
 import LingoConnect.app.dto.TopQuestionDTO;
-import LingoConnect.app.entity.SecondQuestion;
 import LingoConnect.app.response.SuccessResponse;
 import LingoConnect.app.service.SecondQuestionService;
 import LingoConnect.app.service.TopQuestionService;
+import com.google.gson.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,21 +13,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,18 +74,27 @@ public class QuestionController {
                     )
             }
     )
-    public ResponseEntity<?> getQuestion(@RequestParam(name = "topic") String topic) {
+    public ResponseEntity<?> getMainQuestion(@RequestParam(name = "topic") String topic) {
         try {
-            TopQuestionDTO topQuestionDTO = topQuestionService.findByTopic(topic);
-            if (topQuestionDTO == null) {
+            ArrayList<TopQuestionDTO> topQuestionDTOs = topQuestionService.findAllByTopic(topic);
+            if (topQuestionDTOs.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
 
-            HashMap<String, String> responseBody = new HashMap<>();
-            responseBody.put("question", topQuestionDTO.getQuestion());
-            responseBody.put("topic", topic);
 
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(responseBody);
+            JsonArray jsonArray = new JsonArray();
+
+            for(TopQuestionDTO topQuestionDTO: topQuestionDTOs){
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("difficulty",topQuestionDTO.getDifficulty());
+                jsonObject.addProperty("question",topQuestionDTO.getQuestion());
+                jsonArray.add(jsonObject);
+            }
+
+            Gson gson = new Gson(); // Gson 객체 생성
+            String jsonResponse = gson.toJson(jsonArray); // JsonObject를 JSON 문자열로 변환
+
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jsonResponse);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
         }
@@ -129,30 +130,21 @@ public class QuestionController {
                     )
             }
     )
-    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic) throws IOException {
+    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic) {
         TopQuestionDTO topQuestionDTO = topQuestionService.findByTopic(topic);
-
         if (topQuestionDTO == null) {
             return ResponseEntity.notFound().build();
         }
 
         ArrayList<SecondQuestionDTO> secondQuestionDTOS = secondQuestionService.findByTopQuestionId(topQuestionDTO.getId());
-
         List<Map<String, Object>> response = new ArrayList<>();
 
-        for(SecondQuestionDTO secondQuestionDTO : secondQuestionDTOS) {
-            Resource resource = new FileSystemResource(imagePath + secondQuestionDTO.getImageName());
-            if (!resource.exists()) {
-                log.error("Resource not found: {}", resource);
-            }
-
-            byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
-            String encodedImage = Base64Utils.encodeToString(imageBytes);
-
+        for (SecondQuestionDTO secondQuestionDTO : secondQuestionDTOS) {
             Map<String, Object> topicObject = new HashMap<>();
             topicObject.put("main_question_id", secondQuestionDTO.getTopQuestionId());
             topicObject.put("question", secondQuestionDTO.getQuestion());
-            topicObject.put(topic + "_image", encodedImage);
+            // 이미지 URL로 변경
+            topicObject.put(topic + "_image", imagePath + secondQuestionDTO.getImageName());
             topicObject.put("topic", topic);
             topicObject.put("id", secondQuestionDTO.getId());
 

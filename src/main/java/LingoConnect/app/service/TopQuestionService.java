@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +42,7 @@ public class TopQuestionService {
                 .id(existingTopQuestion.getId()) // 기존 ID 유지
                 .topic(topQuestionDTO.getTopic()) // 새 주제
                 .question(topQuestionDTO.getQuestion()) // 새 질문
+                .difficulty(topQuestionDTO.getDifficulty())
                 .build();
 
         // 변경된 내용을 저장
@@ -61,6 +63,7 @@ public class TopQuestionService {
                 .id(topQuestion.getId())
                 .topic(topQuestion.getTopic())
                 .question(topQuestion.getQuestion())
+                .difficulty(topQuestion.getDifficulty())
                 .build();
 
         return topQuestionDTO;
@@ -70,6 +73,7 @@ public class TopQuestionService {
         TopQuestion topQuestion = TopQuestion.builder()
                 .topic(topQuestionDTO.getTopic())
                 .question(topQuestionDTO.getQuestion())
+                .difficulty(topQuestionDTO.getDifficulty())
                 .build();
         return topQuestion;
     }
@@ -83,5 +87,19 @@ public class TopQuestionService {
 
     public List<String> getDistinctTopics() {
         return topQuestionRepository.findDistinctTopics();
+    }
+
+    public ArrayList<TopQuestionDTO> findAllByTopic(String topic) {
+        List<TopQuestion> topQuestionList = topQuestionRepository.findAllByTopic(topic);
+
+        ArrayList<TopQuestionDTO> topQuestionDTOS = new ArrayList<>();
+
+        for(TopQuestion topQuestion : topQuestionList){
+            TopQuestionDTO dto = toDto(topQuestion);
+
+            topQuestionDTOS.add(dto);
+        }
+
+        return topQuestionDTOS;
     }
 }
