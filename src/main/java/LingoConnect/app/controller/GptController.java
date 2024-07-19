@@ -1,7 +1,9 @@
 package LingoConnect.app.controller;
 
+import LingoConnect.app.dto.FeedbackDTO;
 import LingoConnect.app.request.GptRequest;
 import LingoConnect.app.response.SuccessResponse;
+import LingoConnect.app.service.FeedbackService;
 import LingoConnect.app.service.GptService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -30,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class GptController {
 
-    @Autowired
-    private GptService gptService;
+    private final GptService gptService;
+    private final FeedbackService feedbackService;
 
     private int flag = 0;
 
@@ -72,23 +74,35 @@ public class GptController {
         if(count>5){
             return ResponseEntity.ok().body("과금 방지 제한");
         }
-        String title = gptRequest.getTopic();
+
+        String topic = gptRequest.getTopic();
         String question = gptRequest.getQuestion();
         String userAnswer = gptRequest.getUserAnswer();
 
-        String content = title + question + userAnswer;
+        String content = topic + question + userAnswer;
 
+        String assistantId = null;
         if(gptService.checkAssistant("lingoConnect")){
             // 이미 lingoConnect Ai가 존재하는 경우
-            String assistantId = "asst_72rWdwPlhnx8wsH6kSZ2Nypk";
-
-            return ResponseEntity.ok().body(response(content, assistantId));
+            assistantId = "asst_72rWdwPlhnx8wsH6kSZ2Nypk";
         } else {
             // lingoConnect Ai를 새로 생성하는 경우
-            String assistantId = gptService.getAssistantId("gpt-3.5-turbo-0125");
-
-            return ResponseEntity.ok().body(response(content, assistantId));
+            assistantId = gptService.getAssistantId("gpt-3.5-turbo-0125");
         }
+
+        String gptFeedback = response(content, assistantId);
+
+        // ----------- 피드백 저장 -------------
+        FeedbackDTO feedbackDTO = FeedbackDTO.builder()
+                .userId(1L) // <------------------ 수정 필요
+                .topic(topic)
+                .question(question)
+                .userAnswer(userAnswer)
+                .feedback(gptFeedback)
+                .build();
+
+        feedbackService.createFeedback(feedbackDTO);
+        return ResponseEntity.ok().body(gptFeedback);
     }
 
     private String response(String content, String assistantId) throws InterruptedException {

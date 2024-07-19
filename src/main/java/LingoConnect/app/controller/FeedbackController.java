@@ -1,8 +1,6 @@
 package LingoConnect.app.controller;
 
 import LingoConnect.app.response.SuccessResponse;
-import LingoConnect.app.service.PronunciationEvalService;
-import LingoConnect.app.service.SttService;
 import LingoConnect.app.utils.AudioFileUtils;
 import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,21 +14,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-@RequestMapping("/pronunciation")
+@RequestMapping("/feedback")
 @RequiredArgsConstructor
-public class PronunciationController {
-
-    private final PronunciationEvalService pronunciationEvalService;
-    private final SttService sttService;
-
+public class FeedbackController {
     @PostMapping("/")
     @Transactional
     @Operation(
-            summary = "Upload Int16Array to get pronunciation evaluation and to get text from voice data",
+            summary = "피드백을 통해 사용자의 패턴 분석",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -58,27 +55,7 @@ public class PronunciationController {
                     )
             }
     )
-    public ResponseEntity<?> evaluateAndExtractVoiceData(@RequestBody byte[] voiceData) {
-        String fileName = null;
-
-        try {
-            fileName = AudioFileUtils.convertAndStorePcm(voiceData);
-            log.info("File stored at {}", fileName);
-
-        } catch (Exception e) {
-            log.error("Error processing voice data", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing voice data");
-        }
-
-        log.info("File successfully stored at: {}", fileName);
-
-        String text = sttService.speechToText(fileName);
-        String evaluated = pronunciationEvalService.evaluate(fileName);
-
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("text",text);
-        jsonObject.addProperty("evaluated",evaluated);
-
-        return ResponseEntity.ok().body(jsonObject);
+    public ResponseEntity<?> getPattern() {
+        return ResponseEntity.ok().body("test");
     }
 }
