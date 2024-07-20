@@ -75,7 +75,7 @@ public class GptController {
             return ResponseEntity.ok().body("과금 방지 제한");
         }
 
-        String topic = gptRequest.getTopic();
+        String topic = gptRequest.getTitle();
         String question = gptRequest.getQuestion();
         String userAnswer = gptRequest.getUserAnswer();
 

@@ -9,19 +9,34 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
 
 @Component
 public class AudioFileUtils {
 
-    public static String convertAndStorePcm(byte[] audioData) throws IOException, UnsupportedAudioFileException {
-        // 가정: audioData는 이미 PCM 형식이거나 변환 로직이 필요
-        ByteArrayInputStream bis = new ByteArrayInputStream(audioData);
+    public static String convertAndStorePcm(InputStream audioData) throws IOException, UnsupportedAudioFileException {
+        // 버퍼를 사용하여 InputStream의 데이터를 읽습니다.
+        byte[] buffer = new byte[audioData.available()];
+        audioData.read(buffer);
+        ByteArrayInputStream bis = new ByteArrayInputStream(buffer);
+
+        // AudioInputStream 생성
         AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
 
+        // 파일 저장을 위한 디렉토리 확인 및 생성
         File directory = new File("src/main/resources/audio");
-        File outputFile = new File(directory,"convertedAudio.pcm");
+        if (!directory.exists()) {
+            directory.mkdirs(); // 디렉토리가 없으면 생성
+        }
+
+        String fileName = "convertedAudio.wav";
+        // 파일 객체 생성
+        File outputFile = new File(directory, fileName); // .pcm에서 .wav로 수정
+
+        // WAVE 형식으로 오디오 데이터 쓰기
         AudioSystem.write(ais, AudioFileFormat.Type.WAVE, outputFile);
 
-        return outputFile.getName();
+        return fileName;
     }
 }

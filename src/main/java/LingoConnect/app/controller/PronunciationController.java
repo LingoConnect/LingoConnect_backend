@@ -18,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.InputStream;
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("/pronunciation")
@@ -58,7 +61,7 @@ public class PronunciationController {
                     )
             }
     )
-    public ResponseEntity<?> evaluateAndExtractVoiceData(@RequestBody byte[] voiceData) {
+    public ResponseEntity<?> evaluateAndExtractVoiceData(@RequestBody InputStream voiceData) {
         String fileName = null;
 
         try {

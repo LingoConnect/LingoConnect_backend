@@ -13,12 +13,12 @@ import lombok.*;
 public class GptRequest {
     @NotBlank(message = "{not_blank}")
     @Schema(
-            name = "topic",
-            description = "topic",
+            name = "title",
+            description = "title",
             type = "String",
             requiredMode = Schema.RequiredMode.REQUIRED,
             example = "주제: 일상 대화 연습\n")
-    private String topic;
+    private String title;
 
     @NotBlank(message = "{not_blank}")
     @Schema(
@@ -35,6 +35,6 @@ public class GptRequest {
             description = "userAnswer",
             type = "String",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            example = "사용자: 나는 미술 수업을 정말 좋아해!")
+            example = "지적장애인: 나는 미술 수업을 정말 좋아해!")
     private String userAnswer;
 }
