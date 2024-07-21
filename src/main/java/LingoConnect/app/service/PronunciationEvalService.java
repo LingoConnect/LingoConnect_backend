@@ -45,7 +45,7 @@ public class PronunciationEvalService {
         Map<String, Object> request = new HashMap<>();
         Map<String, String> argument = new HashMap<>();
         
-        String filePath = audioFilePath + "/" + audioFileName;
+        String filePath = audioFilePath + audioFileName;
         String audioContents = null;
         
         try {

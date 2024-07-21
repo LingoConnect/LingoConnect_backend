@@ -4,7 +4,9 @@ import LingoConnect.app.response.SuccessResponse;
 import LingoConnect.app.service.PronunciationEvalService;
 import LingoConnect.app.service.SttService;
 import LingoConnect.app.utils.AudioFileUtils;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +36,18 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/pronunciation")
-@RequiredArgsConstructor
 public class PronunciationController {
 
     private final PronunciationEvalService pronunciationEvalService;
     private final SttService sttService;
+
+    private final String audioFilePath;
+
+    public PronunciationController(PronunciationEvalService pronunciationEvalService, SttService sttService, @Value("${etri.file-path}") String audioFilePath) {
+        this.pronunciationEvalService = pronunciationEvalService;
+        this.sttService = sttService;
+        this.audioFilePath = audioFilePath;
+    }
 
     @PostMapping("/")
     @Transactional
@@ -70,16 +80,19 @@ public class PronunciationController {
                     )
             }
     )
-    public String evaluateAndExtractVoiceData(@RequestParam("formData") MultipartFile voiceData) {
+    public ResponseEntity<?> evaluateAndExtractVoiceData(@RequestParam("formData") MultipartFile voiceData) {
         String fileName = null;
 
         log.info("executed");
         if (voiceData.isEmpty()) {
-            return "Failed to upload the file because it is empty";
+            log.error("Failed to upload the file because it is empty");
+            return ResponseEntity.notFound().build();
         }
 
-        String uploadDir = "uploaded_files/";
-        Path targetPath = Paths.get(uploadDir + voiceData.getOriginalFilename());
+        fileName = voiceData.getOriginalFilename();
+        Path targetPath = Paths.get(audioFilePath + fileName);
+
+        log.info("targetPath: {}", targetPath);
 
         try {
             // InputStream을 사용하여 파일을 서버에 저장
@@ -87,10 +100,23 @@ public class PronunciationController {
 
             // 저장된 WAV 파일을 PCM 형식으로 변환
             File pcmFile = convertWavToPcm(targetPath.toFile());
-            return "File uploaded and converted successfully: " + pcmFile.getAbsolutePath();
+            String evaluated = pronunciationEvalService.evaluate(fileName);
+            String text = sttService.speechToText(fileName);
+
+            log.info("evaluated : {}", evaluated);
+            log.info("text : {}", text);
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("score", evaluated);
+            jsonObject.addProperty("text", text);
+
+            Gson gson = new Gson(); // Gson 객체 생성
+            String jsonResponse = gson.toJson(jsonObject);
+
+            return ResponseEntity.ok().body(jsonResponse);
         } catch (IOException e) {
             e.printStackTrace();
-            return "Failed to upload or convert file due to IO exception";
+            log.error("Failed to upload the file because of error");
+            return ResponseEntity.notFound().build();
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }

@@ -88,6 +88,7 @@ public class QuestionController {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("difficulty",topQuestionDTO.getDifficulty());
                 jsonObject.addProperty("question",topQuestionDTO.getQuestion());
+                jsonObject.addProperty("mainQuestionId",topQuestionDTO.getId());
                 jsonArray.add(jsonObject);
             }
 
@@ -130,8 +131,8 @@ public class QuestionController {
                     )
             }
     )
-    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic) {
-        TopQuestionDTO topQuestionDTO = topQuestionService.findByTopic(topic);
+    public ResponseEntity<?> getSubQuestion(@RequestParam(name = "topic") String topic, @RequestParam(name = "mainQuestionId") String topQuestionId) {
+        TopQuestionDTO topQuestionDTO = topQuestionService.findById(topQuestionId);
         if (topQuestionDTO == null) {
             return ResponseEntity.notFound().build();
         }

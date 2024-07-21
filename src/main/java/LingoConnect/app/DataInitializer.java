@@ -29,13 +29,6 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void insertTopData() {
-        createTopQuestion("학교", "가장 좋아하는 과목은 무엇인가요?","초급");
-        createTopQuestion("음식", "가장 좋아하는 음식은 무엇인가요?","초급");
-        createTopQuestion("여행", "가장 기억에 남는 여행지는 어디인가요?","초급");
-        createTopQuestion("취미", "취미가 무엇인가요?","초급");
-        createTopQuestion("영화", "가장 좋아하는 영화는 무엇인가요?","초급");
-        createTopQuestion("음악", "가장 좋아하는 음악 장르는 무엇인가요?","초급");
-        createTopQuestion("운동", "가장 좋아하는 운동은 무엇인가요?","초급");
         createTopQuestion("운동", "운동할 때 친구랑 같이 하면 더 재미있지? 왜 그럴까?","초급");
         createTopQuestion("운동", "운동하다가 친구가 넘어지면 너는 어떻게 할 거야?","초급");
         createTopQuestion("운동", "축구할 때 규칙을 안 지키면 어떤 일이 생길까?","초급");

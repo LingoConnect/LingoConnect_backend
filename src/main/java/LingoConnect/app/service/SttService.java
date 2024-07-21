@@ -45,7 +45,7 @@ public class SttService {
         Map<String, Object> request = new HashMap<>();
         Map<String, String> argument = new HashMap<>();
 
-        String completeFilePath = audioFilePath + "/" + fileName;
+        String completeFilePath = audioFilePath + fileName;
         try {
             Path path = Paths.get(completeFilePath);
             byte[] audioBytes = Files.readAllBytes(path);
