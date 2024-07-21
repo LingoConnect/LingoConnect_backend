@@ -85,6 +85,13 @@ public class TopQuestionService {
         return toDto(topquestion);
     }
 
+    public TopQuestionDTO findByQuestion(String question) {
+        TopQuestion topquestion = topQuestionRepository.findByQuestion(question)
+                .orElseThrow(() -> new IllegalArgumentException("No TopQuestion found with top question"));
+
+        return toDto(topquestion);
+    }
+
     public List<String> getDistinctTopics() {
         return topQuestionRepository.findDistinctTopics();
     }

@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface TopQuestionRepository extends JpaRepository<TopQuestion, Long> {
     Optional<TopQuestion> findByTopic(String topic);
+    Optional<TopQuestion> findByQuestion(String question);
 
     @Query("SELECT DISTINCT tq.topic FROM TopQuestion tq")
     List<String> findDistinctTopics();
